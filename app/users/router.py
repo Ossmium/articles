@@ -10,6 +10,7 @@ from app.users.schemas import (
 )
 from app.users.auth import get_password_hash, auth_user, create_access_token
 from app.users.dependencies import get_current_user
+from app.logger import logger
 
 
 auth_router = APIRouter(
@@ -30,9 +31,14 @@ async def register_user(user_data: UserRegisterSchema) -> None:
     )
 
     if existing_user:
-        raise HTTPException(status_code=400)
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            detail="Нет данного пользователя",
+        )
 
     hashed_password = get_password_hash(user_data.hashed_password)
+
+    logger.info("Пользователь создан")
 
     await UserService.add(
         username=user_data.username,
@@ -61,6 +67,9 @@ async def login_user(response: Response, user_data: UserAuthSchema) -> str:
         httponly=True,
         max_age=1800,
     )
+
+    logger.info(f"Пользователь #{user.id} вошел в систему")
+
     return access_token
 
 
@@ -71,6 +80,10 @@ async def change_admin_status(
     user: Users = Depends(get_current_user),
 ) -> bool:
     if not user.is_admin:
+        logger.error(
+            f"Попытка изменения статуса администратора пользователем #{user.id}"
+        )
+
         raise HTTPException(
             status.HTTP_403_FORBIDDEN,
             detail="Нет прав на изменение",
@@ -93,6 +106,11 @@ async def change_admin_status(
         id=requested_user.id,
         is_admin=user_status.is_admin,
     )
+
+    logger.info(
+        f"Пользователь #{user.id} изменил статус администартора пользователю #{requested_user.id}"
+    )
+
     return user_status.is_admin
 
 
@@ -103,6 +121,8 @@ async def ban_user(
     user: Users = Depends(get_current_user),
 ) -> bool:
     if not user.is_admin:
+        logger.error(f"Попытка блокировки пользователя пользователем #{user.id}")
+
         raise HTTPException(
             status.HTTP_403_FORBIDDEN,
             detail="Нет прав",
@@ -125,4 +145,9 @@ async def ban_user(
         id=requested_user.id,
         is_banned=user_status.is_banned,
     )
+
+    logger.info(
+        f"Пользователь #{user.id} заблокировал пользователя #{requested_user.id}"
+    )
+
     return user_status.is_banned

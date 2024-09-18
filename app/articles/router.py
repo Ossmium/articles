@@ -23,6 +23,7 @@ from app.articles.schemas import (
     CreateReviewSchema,
 )
 from app.users.dependencies import get_current_user
+from app.logger import logger
 
 router = APIRouter(
     tags=["Articles"],
@@ -52,6 +53,9 @@ async def create_article(
         category=article_data.category,
         author_id=user.id,
     )
+
+    logger.info(f"Статься #{article.id} создана пользователем #{user.id}")
+
     return article
 
 
@@ -59,6 +63,8 @@ async def create_article(
 async def get_article(article_id: int) -> ArticleSchema:
     article = await ArticleService.find_by_id(id=article_id)
     if not article:
+        logger.error("Попытка получения доступа к несуществующей статье")
+
         raise HTTPException(
             status.HTTP_404_NOT_FOUND,
             detail="Статья не найдена",
@@ -82,8 +88,12 @@ async def delete_article(
 
     if article.author_id == user.id or user.is_admin:
         deleted_article = await ArticleService.delete(id=article_id)
+
+        logger.info(f"Статья #{delete_article.id} удалена пользователем #{user.id}")
+
         return deleted_article
 
+    logger.error("Попытка удаления статьи")
     raise HTTPException(
         status.HTTP_403_FORBIDDEN,
         detail="Нет прав на удаление",
@@ -108,6 +118,9 @@ async def add_comment_to_article(
         author_id=user.id,
         article_id=article_id,
     )
+
+    logger.info(f"Пользователь #{user.id} добавил комментарий к статье #{article_id}")
+
     return comment
 
 
@@ -133,6 +146,11 @@ async def delete_comment(
 
     if comment.author_id == user.id or user.is_admin:
         deleted_comment = await CommentService.delete(id=comment_id)
+
+        logger.info(
+            f"Пользователь #{user.id} удалил комментарий у статьи #{article_id}"
+        )
+
         return deleted_comment
 
     raise HTTPException(
@@ -149,6 +167,8 @@ async def get_article_complaints(
     user: Users = Depends(get_current_user),
 ) -> list[ComplaintSchema]:
     if not user.is_admin:
+        logger.error("Попытка получения доступа к жалобам")
+
         raise HTTPException(
             status.HTTP_403_FORBIDDEN,
             detail="Нет прав",
@@ -166,6 +186,7 @@ async def get_article_complaints(
         offset=offset,
         article_id=article_id,
     )
+
     return complaints
 
 
@@ -188,6 +209,9 @@ async def add_complaint_to_article(
         article_id=article_id,
         author_id=user.id,
     )
+
+    logger.info(f"Пользователь #{user.id} пожаловался на статью #{article_id}")
+
     return complaint
 
 
@@ -210,4 +234,7 @@ async def add_review_to_article(
         article_id=article_id,
         author_id=user.id,
     )
+
+    logger.info(f"Пользователь #{user.id} добавил отзыв на статью #{article_id}")
+
     return review
