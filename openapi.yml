@@ -8,8 +8,10 @@ paths:
   /auth/register:
     post:
       tags:
-        - "Auth"
+        - "Авторизация & Регистрация"
       summary: "Регистрация пользователя"
+      description: |
+        "Регистрация пользователя."
       operationId: "register_user_auth_register_post"
       requestBody:
         content:
