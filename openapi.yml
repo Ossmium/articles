@@ -361,6 +361,11 @@ paths:
           schema:
             type: "integer"
             title: "Article Id"
+        - name: "sort"
+          in: "query"
+          required: false
+          schema:
+            $ref: "#/components/schemas/Sorts"
         - name: "limit"
           in: "query"
           required: false
