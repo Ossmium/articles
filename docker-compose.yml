@@ -12,8 +12,6 @@ services:
     ports:
       - 8000:8000
     command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
-    volumes:
-      - ./wait-for-postgres.sh:/wait-for-postgres.sh
   db:
     image: postgres:15
     container_name: articles_db
