@@ -8,6 +8,7 @@ from app.articles.router import router as article_router
 app = FastAPI(
     title="Articles",
     summary="API написания статей и управления ими.",
+    root_path="/api",
 )
 
 app.include_router(auth_router)
