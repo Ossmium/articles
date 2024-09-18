@@ -40,7 +40,7 @@ async def get_articles(
     offset: int = 0,
 ) -> list[ArticleSchema]:
     """
-    Получение списка статей с возможностью фильтрации по категории.
+    Получение списка статей с возможностью фильтрации по категории и сортировки по дате создания статьи.
     """
     return await ArticleService.find_all(
         limit=limit,
