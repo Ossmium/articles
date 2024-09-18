@@ -189,6 +189,7 @@ async def delete_comment(
 @router.get("/{article_id}/complaints", summary="Получение жалоб по статье")
 async def get_article_complaints(
     article_id: int,
+    sort: Sorts | None = None,
     limit: int = 5,
     offset: int = 0,
     user: Users = Depends(get_current_user),
@@ -217,6 +218,7 @@ async def get_article_complaints(
         limit=limit,
         offset=offset,
         article_id=article_id,
+        sort=sort,
     )
 
     return complaints
