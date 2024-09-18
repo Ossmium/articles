@@ -7,7 +7,7 @@ FastAPI, SQLAlchemy, PostgreSQL
 3. В терминале ввести команду `docker-compose up -d --build`
 4. Перейти по адресу http://localhost:8000/docs
 5. Использовать ручку API `/auth/register` на странице http://localhost:8000/docs
-6. Использовать ручку `/auth/login` на странице http://localhost:8000/docs
+6. Использовать ручку API `/auth/login` на странице http://localhost:8000/docs
 7. После этого можно использовать остальные ручки на странице http://localhost:8000/docs
 
 ## Что было сделано
