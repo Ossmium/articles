@@ -105,7 +105,7 @@ async def delete_article(
             detail="Статья не найдена",
         )
 
-    if article.author_id == user.id or user.is_admin:
+    if article.author_id == user.id:
         deleted_article = await ArticleService.delete(id=article_id)
 
         logger.info(f"Статья #{delete_article.id} удалена пользователем #{user.id}")
