@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     POSTGRES_DATABASE: str
     POSTGRES_DRIVER: str
     POSTGRES_CONN: str
+    SECRET_KEY: str
+    SECRET_ALGORITHM: str
 
     model_config = SettingsConfigDict(env_file=".env")
 

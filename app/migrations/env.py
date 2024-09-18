@@ -6,8 +6,8 @@ from sqlalchemy import pool
 from alembic import context
 
 from app.database import Base
-from app.articles.models import Article, Comment
-from app.users.models import User
+from app.articles.models import Articles, Comments
+from app.users.models import Users
 from app.config import settings
 
 # this is the Alembic Config object, which provides
