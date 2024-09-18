@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
 
-    model_config = SettingsConfigDict(env_file=".env-dev")
+    model_config = SettingsConfigDict(env_file=".env-non-dev")
 
 
 settings = Settings()
