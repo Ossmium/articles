@@ -3,8 +3,8 @@ FROM python:3.11.3
 WORKDIR /usr/src/app
 
 RUN pip install --upgrade pip
-COPY ./req.txt /usr/src/app/
-RUN pip install -r req.txt
+COPY ./requirements.txt /usr/src/app/
+RUN pip install -r requirements.txt
 
 ENV PYTHONUNBUFFERED=1
 
