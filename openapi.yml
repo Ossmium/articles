@@ -1,0 +1,681 @@
+openapi: "3.1.0"
+info:
+  title: "Articles"
+  version: "0.1.0"
+  description: |
+    API написания статей и управления ими.
+paths:
+  /auth/register:
+    post:
+      tags:
+        - "Auth"
+      summary: "Регистрация пользователя"
+      operationId: "register_user_auth_register_post"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegisterSchema"
+        required: true
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema: {}
+        "422":
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /auth/login:
+    post:
+      tags:
+        - "Auth"
+      summary: "Авторизация пользователя"
+      operationId: "login_user_auth_login_post"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserAuthSchema"
+        required: true
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                type: "string"
+                title: "Response Login User Auth Login Post"
+        "422":
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /users/{user_id}/is_admin:
+    patch:
+      tags:
+        - "Users"
+      summary: "Изменение статуса администратора"
+      operationId: "change_admin_status_users__user_id__is_admin_patch"
+      parameters:
+        - name: "user_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            title: "User Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangeIsAdminStatusSchema"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+                title: "Response Change Admin Status Users User Id Is Admin Patch"
+        "422":
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /users/{user_id}/ban:
+    patch:
+      tags:
+        - "Users"
+      summary: "Блокировка пользователя"
+      operationId: "ban_user_users__user_id__ban_patch"
+      parameters:
+        - name: "user_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            title: "User Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BanUserSchema"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+                title: "Response Ban User Users User Id Ban Patch"
+        "422":
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /articles:
+    get:
+      tags:
+        - "Articles"
+      summary: "Получение статей"
+      operationId: "get_articles_articles_get"
+      parameters:
+        - name: "category"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            title: "Category"
+        - name: "limit"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            default: 5
+            title: "Limit"
+        - name: "offset"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            default: 0
+            title: "Offset"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ArticleSchema"
+                title: "Response Get Articles Articles Get"
+        "422":
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /articles/new:
+    post:
+      tags:
+        - "Articles"
+      summary: "Создание статьи"
+      operationId: "create_article_articles_new_post"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateArticleSchema"
+        required: true
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArticleSchema"
+        "422":
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /articles/{article_id}:
+    get:
+      tags:
+        - "Articles"
+      summary: "Получение статьи"
+      operationId: "get_article_articles__article_id__get"
+      parameters:
+        - name: "article_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            title: "Article Id"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArticleSchema"
+        "422":
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /articles/{article_id}/delete:
+    delete:
+      tags:
+        - "Articles"
+      summary: "Удаление статьи"
+      operationId: "delete_article_articles__article_id__delete_delete"
+      parameters:
+        - name: "article_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            title: "Article Id"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArticleSchema"
+        "422":
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /articles/{article_id}/comments:
+    post:
+      tags:
+        - "Articles"
+      summary: "Добавление комментария к статье"
+      operationId: "add_comment_to_article_articles__article_id__comments_post"
+      parameters:
+        - name: "article_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            title: "Article Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommentSchema"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentSchema"
+        "422":
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /articles/{article_id}/comments/{comment_id}:
+    delete:
+      tags:
+        - "Articles"
+      summary: "Удаление комментария"
+      operationId: "delete_comment_articles__article_id__comments__comment_id__delete"
+      parameters:
+        - name: "article_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            title: "Article Id"
+        - name: "comment_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            title: "Comment Id"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentSchema"
+        "422":
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /articles/{article_id}/complaints:
+    get:
+      tags:
+        - "Articles"
+      summary: "Получение жалоб по статье"
+      operationId: "get_article_complaints_articles__article_id__complaints_get"
+      parameters:
+        - name: "article_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            title: "Article Id"
+        - name: "limit"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            default: 5
+            title: "Limit"
+        - name: "offset"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            default: 0
+            title: "Offset"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ComplaintSchema"
+                title: "Response Get Article Complaints Articles Article Id Complaints Get"
+        "422":
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+    post:
+      tags:
+        - "Articles"
+      summary: "Создание жалобы на статью"
+      operationId: "add_complaint_to_article_articles__article_id__complaints_post"
+      parameters:
+        - name: "article_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            title: "Article Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateComplaintSchema"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComplaintSchema"
+        "422":
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /articles/{article_id}/reviews:
+    post:
+      tags:
+        - "Articles"
+      summary: "Создание отзыва на статью"
+      operationId: "add_review_to_article_articles__article_id__reviews_post"
+      parameters:
+        - name: "article_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            title: "Article Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReviewSchema"
+      responses:
+        "200":
+          description: "Successful Response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewSchema"
+        "422":
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+
+components:
+  schemas:
+    ArticleSchema:
+      type: object
+      title: ArticleSchema
+      properties:
+        id:
+          type: integer
+          title: Id
+        title:
+          type: string
+          title: Title
+        content:
+          type: string
+          title: Content
+        category:
+          type: string
+          title: Category
+        author_id:
+          type: integer
+          title: Author Id
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      required:
+        - id
+        - title
+        - content
+        - category
+        - author_id
+        - created_at
+      
+    BanUserSchema:
+      type: object
+      title: BanUserSchema
+      properties:
+        is_banned:
+          type: boolean
+          title: Is Banned
+      required:
+        - is_banned
+
+    ChangeIsAdminStatusSchema:
+      type: object
+      title: ChangeIsAdminStatusSchema
+      properties:
+        is_admin:
+          type: boolean
+          title: Is Admin
+      required:
+        - is_admin
+
+    CommentSchema:
+      type: object
+      title: CommentSchema
+      properties:
+        id:
+          type: integer
+          title: Id
+        content:
+          type: string
+          title: Content
+        author_id:
+          type: integer
+          title: Author Id
+        article_id:
+          type: integer
+          title: Article Id
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      required:
+        - id
+        - content
+        - author_id
+        - article_id
+        - created_at
+
+    ComplaintSchema:
+      type: object
+      title: ComplaintSchema
+      properties:
+        id:
+          type: integer
+          title: Id
+        reason:
+          type: string
+          title: Reason
+        content:
+          anyOf:
+            - type: string
+            - type: null
+          title: Content
+        article_id:
+          type: integer
+          title: Article Id
+        author_id:
+          type: integer
+          title: Author Id
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      required:
+        - id
+        - reason
+        - content
+        - article_id
+        - author_id
+        - created_at
+
+    CreateArticleSchema:
+      type: object
+      title: CreateArticleSchema
+      properties:
+        title:
+          type: string
+          title: Title
+        content:
+          type: string
+          title: Content
+        category:
+          type: string
+          title: Category
+      required:
+        - title
+        - content
+        - category
+
+    CreateCommentSchema:
+      type: object
+      title: CreateCommentSchema
+      properties:
+        content:
+          type: string
+          title: Content
+      required:
+        - content
+
+    CreateComplaintSchema:
+      type: object
+      title: CreateComplaintSchema
+      properties:
+        reason:
+          type: string
+          title: Reason
+        content:
+          type: string
+          title: Content
+      required:
+        - reason
+        - content
+
+    CreateReviewSchema:
+      type: object
+      title: CreateReviewSchema
+      properties:
+        title:
+          type: string
+          title: Title
+        content:
+          anyOf:
+            - type: string
+            - type: null
+          title: Content
+      required:
+        - title
+        - content
+
+    HTTPValidationError:
+      type: object
+      title: HTTPValidationError
+      properties:
+        detail:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValidationError"
+          title: Detail
+
+    ReviewSchema:
+      type: object
+      title: ReviewSchema
+      properties:
+        id:
+          type: integer
+          title: Id
+        title:
+          type: string
+          title: Title
+        content:
+          anyOf:
+            - type: string
+            - type: null
+          title: Content
+        article_id:
+          type: integer
+          title: Article Id
+        author_id:
+          type: integer
+          title: Author Id
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      required:
+        - id
+        - title
+        - content
+        - article_id
+        - author_id
+        - created_at
+
+    UserAuthSchema:
+      type: object
+      title: UserAuthSchema
+      properties:
+        username:
+          type: string
+          title: Username
+        password:
+          type: string
+          title: Password
+      required:
+        - username
+        - password
+
+    UserRegisterSchema:
+      type: object
+      title: UserRegisterSchema
+      properties:
+        username:
+          type: string
+          title: Username
+        hashed_password:
+          type: string
+          title: Hashed Password
+        is_admin:
+          type: boolean
+          title: Is Admin
+      required:
+        - username
+        - hashed_password
+        - is_admin
+
+    ValidationError:
+      type: object
+      title: ValidationError
+      properties:
+        loc:
+          type: array
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      required:
+        - loc
+        - msg
+        - type
