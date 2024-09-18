@@ -24,7 +24,7 @@ users_router = APIRouter(
 
 
 @auth_router.post("/register")
-async def register_user(user_data: UserRegisterSchema):
+async def register_user(user_data: UserRegisterSchema) -> None:
     existing_user = await UserService.find_one_or_none(
         username=user_data.username,
     )
@@ -42,7 +42,7 @@ async def register_user(user_data: UserRegisterSchema):
 
 
 @auth_router.post("/login")
-async def login_user(response: Response, user_data: UserAuthSchema):
+async def login_user(response: Response, user_data: UserAuthSchema) -> str:
     user = await auth_user(
         username=user_data.username,
         password=user_data.password,
@@ -55,7 +55,12 @@ async def login_user(response: Response, user_data: UserAuthSchema):
         )
 
     access_token = create_access_token({"sub": str(user.id)})
-    response.set_cookie("access_token", access_token, httponly=True)
+    response.set_cookie(
+        "access_token",
+        access_token,
+        httponly=True,
+        max_age=1800,
+    )
     return access_token
 
 
@@ -64,7 +69,7 @@ async def change_admin_status(
     user_id: int,
     user_status: ChangeIsAdminStatusSchema,
     user: Users = Depends(get_current_user),
-):
+) -> bool:
     if not user.is_admin:
         raise HTTPException(
             status.HTTP_403_FORBIDDEN,
@@ -96,7 +101,7 @@ async def ban_user(
     user_id: int,
     user_status: BanUserSchema,
     user: Users = Depends(get_current_user),
-):
+) -> bool:
     if not user.is_admin:
         raise HTTPException(
             status.HTTP_403_FORBIDDEN,

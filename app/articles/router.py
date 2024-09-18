@@ -13,10 +13,14 @@ from app.articles.service import (
     ReviewService,
 )
 from app.articles.schemas import (
-    CreateArticleSchema,
     ArticleSchema,
+    CreateArticleSchema,
+    CommentSchema,
     CreateCommentSchema,
+    ComplaintSchema,
     CreateComplaintSchema,
+    ReviewSchema,
+    CreateReviewSchema,
 )
 from app.users.dependencies import get_current_user
 
@@ -41,13 +45,14 @@ async def get_articles(
 async def create_article(
     article_data: CreateArticleSchema,
     user: Users = Depends(get_current_user),
-):
-    await ArticleService.add(
+) -> ArticleSchema:
+    article = await ArticleService.add(
         title=article_data.title,
         content=article_data.content,
         category=article_data.category,
         author_id=user.id,
     )
+    return article
 
 
 @router.get("/{article_id}")
@@ -65,7 +70,7 @@ async def get_article(article_id: int) -> ArticleSchema:
 async def delete_article(
     article_id: int,
     user: Users = Depends(get_current_user),
-):
+) -> ArticleSchema:
     article = await ArticleService.find_one_or_none(
         id=article_id,
     )
@@ -76,8 +81,8 @@ async def delete_article(
         )
 
     if article.author_id == user.id or user.is_admin:
-        await ArticleService.delete(id=article_id)
-        return None
+        deleted_article = await ArticleService.delete(id=article_id)
+        return deleted_article
 
     raise HTTPException(
         status.HTTP_403_FORBIDDEN,
@@ -88,9 +93,9 @@ async def delete_article(
 @router.post("/{article_id}/comments")
 async def add_comment_to_article(
     article_id: int,
-    comment: CreateCommentSchema,
+    comment_data: CreateCommentSchema,
     user: Users = Depends(get_current_user),
-):
+) -> CommentSchema:
     article = await ArticleService.find_by_id(id=article_id)
     if not article:
         raise HTTPException(
@@ -98,11 +103,12 @@ async def add_comment_to_article(
             detail="Статья не найдена",
         )
 
-    await CommentService.add(
-        content=comment.content,
+    comment = await CommentService.add(
+        content=comment_data.content,
         author_id=user.id,
         article_id=article_id,
     )
+    return comment
 
 
 @router.delete("/{article_id}/comments/{comment_id}")
@@ -110,7 +116,7 @@ async def delete_comment(
     article_id: int,
     comment_id: int,
     user: Users = Depends(get_current_user),
-):
+) -> CommentSchema:
     article = await ArticleService.find_by_id(id=article_id)
     if not article:
         raise HTTPException(
@@ -126,8 +132,8 @@ async def delete_comment(
         )
 
     if comment.author_id == user.id or user.is_admin:
-        await CommentService.delete(id=comment_id)
-        return None
+        deleted_comment = await CommentService.delete(id=comment_id)
+        return deleted_comment
 
     raise HTTPException(
         status.HTTP_403_FORBIDDEN,
@@ -135,12 +141,19 @@ async def delete_comment(
     )
 
 
-@router.post("/{article_id}/complaints")
-async def add_complaint_to_article(
+@router.get("/{article_id}/complaints")
+async def get_article_complaints(
     article_id: int,
-    complaint: CreateComplaintSchema,
+    limit: int = 5,
+    offset: int = 0,
     user: Users = Depends(get_current_user),
-):
+) -> list[ComplaintSchema]:
+    if not user.is_admin:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail="Нет прав",
+        )
+
     article = await ArticleService.find_by_id(id=article_id)
     if not article:
         raise HTTPException(
@@ -148,9 +161,53 @@ async def add_complaint_to_article(
             detail="Статья не найдена",
         )
 
-    await ComplaintService.add(
-        reason=complaint.reason,
-        content=complaint.content,
+    complaints = await ComplaintService.find_all(
+        limit=limit,
+        offset=offset,
+        article_id=article_id,
+    )
+    return complaints
+
+
+@router.post("/{article_id}/complaints")
+async def add_complaint_to_article(
+    article_id: int,
+    complaint_data: CreateComplaintSchema,
+    user: Users = Depends(get_current_user),
+) -> ComplaintSchema:
+    article = await ArticleService.find_by_id(id=article_id)
+    if not article:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            detail="Статья не найдена",
+        )
+
+    complaint = await ComplaintService.add(
+        reason=complaint_data.reason,
+        content=complaint_data.content,
         article_id=article_id,
         author_id=user.id,
     )
+    return complaint
+
+
+@router.post("/{article_id}/reviews")
+async def add_review_to_article(
+    article_id: int,
+    review_data: CreateReviewSchema,
+    user: Users = Depends(get_current_user),
+) -> ReviewSchema:
+    article = await ArticleService.find_by_id(id=article_id)
+    if not article:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            detail="Статья не найдена",
+        )
+
+    review = await ReviewService.add(
+        title=review_data.title,
+        content=review_data.content,
+        article_id=article_id,
+        author_id=user.id,
+    )
+    return review

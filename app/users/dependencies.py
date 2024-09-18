@@ -25,7 +25,10 @@ async def get_current_user(token: str = Depends(get_token)):
             settings.SECRET_ALGORITHM,
         )
     except JWTError:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status.HTTP_401_UNAUTHORIZED,
+            detail="Ошибка авторизации",
+        )
 
     expire = payload.get("exp")
     if not expire or int(expire) < int(datetime.utcnow().timestamp()):

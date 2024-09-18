@@ -46,20 +46,30 @@ class BaseService:
     @classmethod
     async def add(cls, **data):
         async with async_session_maker() as session:
-            query = insert(cls.model).values(**data)
-            await session.execute(query)
+            query = insert(cls.model).values(**data).returning(cls.model)
+            result = await session.execute(query)
             await session.commit()
+            return result.scalar_one_or_none()
 
     @classmethod
     async def delete(cls, **data):
         async with async_session_maker() as session:
-            query = delete(cls.model).filter_by(**data)
-            await session.execute(query)
+            query = delete(cls.model).filter_by(**data).returning(cls.model)
+            result = await session.execute(query)
             await session.commit()
+            return result.scalar_one_or_none()
 
     @classmethod
     async def update(cls, id: int, **data):
         async with async_session_maker() as session:
-            query = update(cls.model).values(**data).filter_by(id=id)
-            await session.execute(query)
+            query = (
+                update(cls.model)
+                .values(**data)
+                .filter_by(
+                    id=id,
+                )
+                .returning(cls.model)
+            )
+            result = await session.execute(query)
             await session.commit()
+            return result.scalar_one_or_none()
