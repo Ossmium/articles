@@ -4,6 +4,12 @@ info:
   version: "0.1.0"
   description: |
     API написания статей и управления ими.
+
+servers:
+  - url: http://localhost:8080/api
+    description: Локальный сервер API
+
+
 paths:
   /auth/register:
     post:
@@ -138,6 +144,8 @@ paths:
       tags:
         - "Статьи"
       summary: "Получение статей"
+      description: |
+        Получение списка статей с возможностью фильтрации по категории и сортировки по дате создания статьи.
       operationId: "get_articles_articles_get"
       parameters:
         - name: "category"
@@ -146,6 +154,11 @@ paths:
           schema:
             type: "string"
             title: "Category"
+        - name: "sort"
+          in: "query"
+          required: false
+          schema:
+            $ref: "#/components/schemas/Sorts"
         - name: "limit"
           in: "query"
           required: false
@@ -181,6 +194,8 @@ paths:
       tags:
         - "Статьи"
       summary: "Создание статьи"
+      description: |
+        Создание статьи.
       operationId: "create_article_articles_new_post"
       requestBody:
         content:
@@ -206,6 +221,8 @@ paths:
       tags:
         - "Статьи"
       summary: "Получение статьи"
+      description: |
+        Получение детальной информации по статье.
       operationId: "get_article_articles__article_id__get"
       parameters:
         - name: "article_id"
@@ -232,6 +249,10 @@ paths:
       tags:
         - "Статьи"
       summary: "Удаление статьи"
+      description: |
+        Удаление статьи.
+        
+        Удаление статьи возможно только пользователем, ее написавшим или администратором.
       operationId: "delete_article_articles__article_id__delete_delete"
       parameters:
         - name: "article_id"
@@ -258,6 +279,8 @@ paths:
       tags:
         - "Статьи"
       summary: "Добавление комментария к статье"
+      description: |
+        Добавление комментария к статье.
       operationId: "add_comment_to_article_articles__article_id__comments_post"
       parameters:
         - name: "article_id"
@@ -290,6 +313,10 @@ paths:
       tags:
         - "Статьи"
       summary: "Удаление комментария"
+      description: |
+        Удаление комментария у статьи.
+        
+        Удаление комментария возможно только пользователем, его написавшим или администратором.
       operationId: "delete_comment_articles__article_id__comments__comment_id__delete"
       parameters:
         - name: "article_id"
@@ -322,6 +349,10 @@ paths:
       tags:
         - "Статьи"
       summary: "Получение жалоб по статье"
+      description: |
+        Получение списка жалоб к статье.
+        
+        Получение списка возможно только администратором.
       operationId: "get_article_complaints_articles__article_id__complaints_get"
       parameters:
         - name: "article_id"
@@ -364,6 +395,8 @@ paths:
       tags:
         - "Статьи"
       summary: "Создание жалобы на статью"
+      description: |
+        Отправка жалобы на статью.
       operationId: "add_complaint_to_article_articles__article_id__complaints_post"
       parameters:
         - name: "article_id"
@@ -396,6 +429,8 @@ paths:
       tags:
         - "Статьи"
       summary: "Создание отзыва на статью"
+      description: |
+        Отправка отзыва на статью.
       operationId: "add_review_to_article_articles__article_id__reviews_post"
       parameters:
         - name: "article_id"
@@ -637,6 +672,13 @@ components:
         - article_id
         - author_id
         - created_at
+
+    Sorts:
+      type: string
+      enum:
+        - "Сначала новые"
+        - "Сначала старые"
+      title: Sorts
 
     UserAuthSchema:
       type: object
