@@ -27,7 +27,7 @@ from app.logger import logger
 from app.articles.enums import Sorts
 
 router = APIRouter(
-    tags=["Articles"],
+    tags=["Статьи"],
     prefix="/articles",
 )
 

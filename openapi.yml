@@ -11,7 +11,7 @@ paths:
         - "Авторизация & Регистрация"
       summary: "Регистрация пользователя"
       description: |
-        "Регистрация пользователя."
+        Регистрация пользователя.
       operationId: "register_user_auth_register_post"
       requestBody:
         content:
@@ -34,8 +34,10 @@ paths:
   /auth/login:
     post:
       tags:
-        - "Auth"
+        - "Авторизация & Регистрация"
       summary: "Авторизация пользователя"
+      description: |
+        Авторизация пользователя.
       operationId: "login_user_auth_login_post"
       requestBody:
         content:
@@ -60,8 +62,12 @@ paths:
   /users/{user_id}/is_admin:
     patch:
       tags:
-        - "Users"
+        - "Пользователи"
       summary: "Изменение статуса администратора"
+      description: |
+        Изменение статуса администратора пользователя.
+
+        Изменять его может только администратор.
       operationId: "change_admin_status_users__user_id__is_admin_patch"
       parameters:
         - name: "user_id"
@@ -83,7 +89,7 @@ paths:
             application/json:
               schema:
                 type: "boolean"
-                title: "Response Change Admin Status Users User Id Is Admin Patch"
+                title: "Response Change Admin Status Пользователи User Id Is Admin Patch"
         "422":
           description: "Validation Error"
           content:
@@ -93,8 +99,12 @@ paths:
   /users/{user_id}/ban:
     patch:
       tags:
-        - "Users"
+        - "Пользователи"
       summary: "Блокировка пользователя"
+      description: |
+        Блокировка пользователя.
+
+        Банить пользователей может только администратор.
       operationId: "ban_user_users__user_id__ban_patch"
       parameters:
         - name: "user_id"
@@ -116,7 +126,7 @@ paths:
             application/json:
               schema:
                 type: "boolean"
-                title: "Response Ban User Users User Id Ban Patch"
+                title: "Response Ban User Пользователи User Id Ban Patch"
         "422":
           description: "Validation Error"
           content:
@@ -126,7 +136,7 @@ paths:
   /articles:
     get:
       tags:
-        - "Articles"
+        - "Статьи"
       summary: "Получение статей"
       operationId: "get_articles_articles_get"
       parameters:
@@ -169,7 +179,7 @@ paths:
   /articles/new:
     post:
       tags:
-        - "Articles"
+        - "Статьи"
       summary: "Создание статьи"
       operationId: "create_article_articles_new_post"
       requestBody:
@@ -194,7 +204,7 @@ paths:
   /articles/{article_id}:
     get:
       tags:
-        - "Articles"
+        - "Статьи"
       summary: "Получение статьи"
       operationId: "get_article_articles__article_id__get"
       parameters:
@@ -220,7 +230,7 @@ paths:
   /articles/{article_id}/delete:
     delete:
       tags:
-        - "Articles"
+        - "Статьи"
       summary: "Удаление статьи"
       operationId: "delete_article_articles__article_id__delete_delete"
       parameters:
@@ -246,7 +256,7 @@ paths:
   /articles/{article_id}/comments:
     post:
       tags:
-        - "Articles"
+        - "Статьи"
       summary: "Добавление комментария к статье"
       operationId: "add_comment_to_article_articles__article_id__comments_post"
       parameters:
@@ -278,7 +288,7 @@ paths:
   /articles/{article_id}/comments/{comment_id}:
     delete:
       tags:
-        - "Articles"
+        - "Статьи"
       summary: "Удаление комментария"
       operationId: "delete_comment_articles__article_id__comments__comment_id__delete"
       parameters:
@@ -310,7 +320,7 @@ paths:
   /articles/{article_id}/complaints:
     get:
       tags:
-        - "Articles"
+        - "Статьи"
       summary: "Получение жалоб по статье"
       operationId: "get_article_complaints_articles__article_id__complaints_get"
       parameters:
@@ -352,7 +362,7 @@ paths:
                 $ref: "#/components/schemas/HTTPValidationError"
     post:
       tags:
-        - "Articles"
+        - "Статьи"
       summary: "Создание жалобы на статью"
       operationId: "add_complaint_to_article_articles__article_id__complaints_post"
       parameters:
@@ -384,7 +394,7 @@ paths:
   /articles/{article_id}/reviews:
     post:
       tags:
-        - "Articles"
+        - "Статьи"
       summary: "Создание отзыва на статью"
       operationId: "add_review_to_article_articles__article_id__reviews_post"
       parameters:
