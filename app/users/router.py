@@ -14,18 +14,21 @@ from app.logger import logger
 
 
 auth_router = APIRouter(
-    tags=["Auth"],
+    tags=["Авторизация & Регистрация"],
     prefix="/auth",
 )
 
 users_router = APIRouter(
-    tags=["Users"],
+    tags=["Пользователи"],
     prefix="/users",
 )
 
 
-@auth_router.post("/register")
+@auth_router.post("/register", summary="Регистрация пользователя")
 async def register_user(user_data: UserRegisterSchema) -> None:
+    """
+    Регистрация пользователя.
+    """
     existing_user = await UserService.find_one_or_none(
         username=user_data.username,
     )
@@ -47,8 +50,11 @@ async def register_user(user_data: UserRegisterSchema) -> None:
     )
 
 
-@auth_router.post("/login")
+@auth_router.post("/login", summary="Авторизация пользователя")
 async def login_user(response: Response, user_data: UserAuthSchema) -> str:
+    """
+    Авторизация пользователя.
+    """
     user = await auth_user(
         username=user_data.username,
         password=user_data.password,
@@ -73,12 +79,17 @@ async def login_user(response: Response, user_data: UserAuthSchema) -> str:
     return access_token
 
 
-@users_router.patch("/{user_id}/is_admin")
+@users_router.patch("/{user_id}/is_admin", summary="Изменение статуса администратора")
 async def change_admin_status(
     user_id: int,
     user_status: ChangeIsAdminStatusSchema,
     user: Users = Depends(get_current_user),
 ) -> bool:
+    """
+    Изменение статуса администратора пользователя.
+
+    Изменять его может только администратор.
+    """
     if not user.is_admin:
         logger.error(
             f"Попытка изменения статуса администратора пользователем #{user.id}"
@@ -114,12 +125,17 @@ async def change_admin_status(
     return user_status.is_admin
 
 
-@users_router.patch("/{user_id}/ban")
+@users_router.patch("/{user_id}/ban", summary="Блокировка пользователя")
 async def ban_user(
     user_id: int,
     user_status: BanUserSchema,
     user: Users = Depends(get_current_user),
 ) -> bool:
+    """
+    Блокировка пользователя.
+
+    Банить пользователей может только администратор.
+    """
     if not user.is_admin:
         logger.error(f"Попытка блокировки пользователя пользователем #{user.id}")
 

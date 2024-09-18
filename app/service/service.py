@@ -1,5 +1,6 @@
-from sqlalchemy import select, insert, delete, update, and_
+from sqlalchemy import select, insert, delete, update, and_, desc
 from app.database import async_session_maker
+from app.articles.enums import Sorts
 
 
 class BaseService:
@@ -24,6 +25,7 @@ class BaseService:
         cls,
         limit: int,
         offset: int,
+        sort: Sorts,
         **filters,
     ):
         conditions = []
@@ -38,6 +40,12 @@ class BaseService:
 
             if conditions:
                 query = query.where(and_(*conditions))
+
+            if sort:
+                if sort == Sorts.NewOnesFirst:
+                    query = query.order_by(desc(cls.model.created_at))
+                else:
+                    query = query.order_by(cls.model.created_at)
 
             query = query.limit(limit).offset(offset)
             result = await session.execute(query)

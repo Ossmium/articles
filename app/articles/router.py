@@ -24,6 +24,7 @@ from app.articles.schemas import (
 )
 from app.users.dependencies import get_current_user
 from app.logger import logger
+from app.articles.enums import Sorts
 
 router = APIRouter(
     tags=["Articles"],
@@ -31,22 +32,32 @@ router = APIRouter(
 )
 
 
-@router.get("")
+@router.get("", summary="Получение статей")
 async def get_articles(
-    category: str = None, limit: int = 5, offset: int = 0
+    category: str = None,
+    sort: Sorts | None = None,
+    limit: int = 5,
+    offset: int = 0,
 ) -> list[ArticleSchema]:
+    """
+    Получение списка статей с возможностью фильтрации по категории.
+    """
     return await ArticleService.find_all(
         limit=limit,
         offset=offset,
         category=category,
+        sort=sort,
     )
 
 
-@router.post("/new")
+@router.post("/new", summary="Создание статьи")
 async def create_article(
     article_data: CreateArticleSchema,
     user: Users = Depends(get_current_user),
 ) -> ArticleSchema:
+    """
+    Создание статьи.
+    """
     article = await ArticleService.add(
         title=article_data.title,
         content=article_data.content,
@@ -59,8 +70,11 @@ async def create_article(
     return article
 
 
-@router.get("/{article_id}")
+@router.get("/{article_id}", summary="Получение статьи")
 async def get_article(article_id: int) -> ArticleSchema:
+    """
+    Получение детальной информации по статье.
+    """
     article = await ArticleService.find_by_id(id=article_id)
     if not article:
         logger.error("Попытка получения доступа к несуществующей статье")
@@ -72,11 +86,16 @@ async def get_article(article_id: int) -> ArticleSchema:
     return article
 
 
-@router.delete("/{article_id}/delete")
+@router.delete("/{article_id}/delete", summary="Удаление статьи")
 async def delete_article(
     article_id: int,
     user: Users = Depends(get_current_user),
 ) -> ArticleSchema:
+    """
+    Удаление статьи.
+
+    Удаление статьи возможно только пользователем, ее написавшим или администратором.
+    """
     article = await ArticleService.find_one_or_none(
         id=article_id,
     )
@@ -100,12 +119,15 @@ async def delete_article(
     )
 
 
-@router.post("/{article_id}/comments")
+@router.post("/{article_id}/comments", summary="Добавление комментария к статье")
 async def add_comment_to_article(
     article_id: int,
     comment_data: CreateCommentSchema,
     user: Users = Depends(get_current_user),
 ) -> CommentSchema:
+    """
+    Добавление комментария к статье.
+    """
     article = await ArticleService.find_by_id(id=article_id)
     if not article:
         raise HTTPException(
@@ -124,12 +146,17 @@ async def add_comment_to_article(
     return comment
 
 
-@router.delete("/{article_id}/comments/{comment_id}")
+@router.delete("/{article_id}/comments/{comment_id}", summary="Удаление комментария")
 async def delete_comment(
     article_id: int,
     comment_id: int,
     user: Users = Depends(get_current_user),
 ) -> CommentSchema:
+    """
+    Удаление комментария у статьи.
+
+    Удаление комментария возможно только пользователем, его написавшим или администратором.
+    """
     article = await ArticleService.find_by_id(id=article_id)
     if not article:
         raise HTTPException(
@@ -159,13 +186,18 @@ async def delete_comment(
     )
 
 
-@router.get("/{article_id}/complaints")
+@router.get("/{article_id}/complaints", summary="Получение жалоб по статье")
 async def get_article_complaints(
     article_id: int,
     limit: int = 5,
     offset: int = 0,
     user: Users = Depends(get_current_user),
 ) -> list[ComplaintSchema]:
+    """
+    Получение списка жалоб к статье.
+
+    Получение списка возможно только администратором.
+    """
     if not user.is_admin:
         logger.error("Попытка получения доступа к жалобам")
 
@@ -190,12 +222,15 @@ async def get_article_complaints(
     return complaints
 
 
-@router.post("/{article_id}/complaints")
+@router.post("/{article_id}/complaints", summary="Создание жалобы на статью")
 async def add_complaint_to_article(
     article_id: int,
     complaint_data: CreateComplaintSchema,
     user: Users = Depends(get_current_user),
 ) -> ComplaintSchema:
+    """
+    Отправка жалобы на статью.
+    """
     article = await ArticleService.find_by_id(id=article_id)
     if not article:
         raise HTTPException(
@@ -215,12 +250,15 @@ async def add_complaint_to_article(
     return complaint
 
 
-@router.post("/{article_id}/reviews")
+@router.post("/{article_id}/reviews", summary="Создание отзыва на статью")
 async def add_review_to_article(
     article_id: int,
     review_data: CreateReviewSchema,
     user: Users = Depends(get_current_user),
 ) -> ReviewSchema:
+    """
+    Отправка отзыва на статью.
+    """
     article = await ArticleService.find_by_id(id=article_id)
     if not article:
         raise HTTPException(
