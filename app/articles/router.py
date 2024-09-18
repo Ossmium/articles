@@ -108,7 +108,7 @@ async def delete_article(
     if article.author_id == user.id:
         deleted_article = await ArticleService.delete(id=article_id)
 
-        logger.info(f"Статья #{delete_article.id} удалена пользователем #{user.id}")
+        logger.info(f"Статья #{deleted_article.id} удалена пользователем #{user.id}")
 
         return deleted_article
 
