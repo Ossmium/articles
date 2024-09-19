@@ -195,7 +195,7 @@ async def get_article_complaints(
     user: Users = Depends(get_current_user),
 ) -> list[ComplaintSchema]:
     """
-    Получение списка жалоб к статье.
+    Получение списка жалоб к статье с возможностью сортировки по дате создания.
 
     Получение списка возможно только администратором.
     """
