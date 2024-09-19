@@ -66,6 +66,12 @@ async def login_user(response: Response, user_data: UserAuthSchema) -> str:
             detail="Неверный логин или пароль",
         )
 
+    if user.is_banned:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Вы заблокированы",
+        )
+
     access_token = create_access_token({"sub": str(user.id)})
     response.set_cookie(
         "access_token",
