@@ -252,7 +252,7 @@ paths:
       description: |
         Удаление статьи.
         
-        Удаление статьи возможно только пользователем, ее написавшим или администратором.
+        Удаление статьи возможно только пользователем, ее написавшим.
       operationId: "delete_article_articles__article_id__delete_delete"
       parameters:
         - name: "article_id"
