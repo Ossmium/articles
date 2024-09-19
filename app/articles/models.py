@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy import Text, ForeignKey, String, TIMESTAMP, func
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
 
@@ -19,15 +19,6 @@ class Articles(Base):
         TIMESTAMP, server_default=func.current_timestamp()
     )
 
-    # author: Mapped["User"] = relationship(
-    #     "User",
-    #     back_populates="articles",
-    # )
-    # comments: Mapped[list["Comment"]] = relationship(
-    #     "Comment",
-    #     back_populates="article",
-    # )
-
 
 class Comments(Base):
     __tablename__ = "comments"
@@ -43,9 +34,6 @@ class Comments(Base):
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP, server_default=func.current_timestamp()
     )
-
-    # author: Mapped["User"] = relationship("User", back_populates="comments")
-    # article: Mapped["Article"] = relationship("Article", back_populates="comments")
 
 
 class Complaints(Base):
